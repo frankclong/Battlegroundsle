@@ -1,13 +1,13 @@
 
 
 class BattlegroundsCard:
-    def __init__(self, id, name, tier, health, attack, minionTypes):
+    def __init__(self, id, name, tier, health, attack, minion_types):
         self.id = id,
         self.name = name,
         self.tier = tier,
         self.health = health,
         self.attack = attack,
-        self.minionTypes = minionTypes
+        self.minion_types = minion_types
     
     def __init__(self, json):
         self.id = json['id']
@@ -15,13 +15,13 @@ class BattlegroundsCard:
         self.tier = json['battlegrounds']['tier']
         self.health = json['health']
         self.attack = json['attack']
-        minionTypes = []
+        minion_types = []
         if 'minionTypeId' in json:
-            minionTypes.append(json['minionTypeId'])
+            minion_types.append(json['minionTypeId'])
             if 'multiTypeIds' in json:
                 for multiTypeId in json['multiTypeIds']:
-                    minionTypes.append(multiTypeId)
+                    minion_types.append(multiTypeId)
         else:
-            minionTypes.append(-1) 
-        self.minionTypes = minionTypes
+            minion_types.append(-1) 
+        self.minion_types = minion_types
         

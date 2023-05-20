@@ -24,8 +24,8 @@ def compare_attack(target, guess):
         return -2
 
 def compare_minion_types(target, guess, minion_type_dict):
-    guess_types = guess.minionTypes
-    target_types = target.minionTypes
+    guess_types = guess.minion_types
+    target_types = target.minion_types
     
     # Check for all 
     if minion_type_dict[target_types[0]] == 'All': 
