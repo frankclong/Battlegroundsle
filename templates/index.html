@@ -3,7 +3,6 @@
 <head>
     <title>Battlegroundsle</title>
     <style>
-        h1 {text-align: center;}
         form {text-align: center;}
         table {text-align: center;
                 table-layout: fixed;
@@ -32,6 +31,7 @@
             margin-right: auto;
         }
     </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css')}}">
     <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 	<script src="https://code.jquery.com/jquery-3.6.0.min.js" crossorigin="anonymous"></script>
 	<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js" crossorigin="anonymous"></script>
@@ -66,12 +66,10 @@
     <h1>Battlegroundsle</h1>
 
     <form method="POST">
-        <button type="submit" name="reset">Reset</button>
-        <br>
         <input type="text" name="input_text" id="input_text" placeholder="Enter a card...">
         <button type="submit" name="guess">Guess</button>
     </form>
-
+    <br>
     <table border="1", class="center">
         <tr>
             <th>Card</th>
@@ -82,12 +80,19 @@
         </tr>
         {% for row in table_rows %}
         <tr>
-            <td class="{{ row[0].1 }}"><img src="{{ row[0].0 }}" height="200" width="140"></td>
+            <td class="{{ row[0].1 }}"><img src="{{ row[0].0 }}" height="150" width="100"></td>
             {% for value, color in row[1:] %}
             <td class="{{ color }}">{{ value }}</td>
             {% endfor %}
         </tr>
         {% endfor %}
     </table>
+    <br>
+    <form method="POST">
+        {% if finished %}
+        <div>Congratulations you got it! Play again?</div> 
+        {% endif %}
+        <button type="submit" name="reset">Reset</button>
+    </form>
 </body>
 </html>

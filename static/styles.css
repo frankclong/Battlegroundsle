@@ -1,0 +1,11 @@
+@font-face {
+    font-family: 'Belwe-Bold';
+    src: url('/static/Belwe-Bold.otf') format('opentype');
+    font-weight: bold;
+    font-style: normal;
+  }
+
+  body {
+    font-family: 'Belwe-Bold', sans-serif;
+    text-align: center;
+  }
