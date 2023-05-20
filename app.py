@@ -63,26 +63,36 @@ def load_minion_types(token):
 
     return type_dict
 
-cards_dict = load_cards(token)
-minion_type_dict = load_minion_types(token)
-CARD_NAMES = [card.name for card in cards_dict.values()]
-NUM_ATTEMPTS = 5
-target_card = random.choice(list(cards_dict.values()))
-print(target_card.name)
+# Constants
+CARDS_DICT = load_cards(token)
+MINION_TYPE_DICT = load_minion_types(token)
+CARD_NAMES = [card.name for card in CARDS_DICT.values()]
+NUM_ATTEMPTS = 5 # not used
+
+# Start game
+target_card = random.choice(list(CARDS_DICT.values()))
+print(target_card.name, flush=True)
 
 app = Flask(__name__)
 
-# Define a list to store the table rows
-table_rows = []
+# Dynamic data
+guesses_and_rows = []
+finished = False
 
 def reset_game():
     global target_card
-    target_card = random.choice(list(cards_dict.values()))
-    print(target_card.name)
-    table_rows.clear()
+    global guesses_and_rows
+    global finished
+    target_card = random.choice(list(CARDS_DICT.values()))
+    print(target_card.name, flush=True)
+    finished = False
+    guesses_and_rows.clear()
 
 def get_guesses():
-    return [row[0][0] for row in table_rows ]
+    return [guess.name for guess, _ in guesses_and_rows ]
+
+def get_rows():
+    return [row for _, row in guesses_and_rows]
 
 def check_value_to_color(value):
     if abs(value) == 0:
@@ -92,28 +102,32 @@ def check_value_to_color(value):
     else:
         return "red"
 
+def is_guess_correct(check):
+    for val in check.values():
+        if val != 0:
+            return False
+    return True
 
 COLUMNS = ["Card", "Tier", "Attack", "Health", "Minion Type"]
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
+    global guesses_and_rows
+    global finished
     if request.method == 'POST':
         if 'guess' in request.form:
             # Get the value from the text input field
             guess_card_name = request.form['input_text']
             
-            # TODO auto suggest
-            # TODO handle invalid name
-            # TODO new game
-            if guess_card_name not in get_guesses():
-                if guess_card_name in cards_dict.keys():
-                    guess_card = cards_dict[guess_card_name]
+            if guess_card_name not in get_guesses() and not finished:
+                if guess_card_name in CARDS_DICT.keys():
+                    guess_card = CARDS_DICT[guess_card_name]
 
                     # Return property matches
-                    check = compare_cards(target_card, guess_card, minion_type_dict)
+                    check = compare_cards(target_card, guess_card, MINION_TYPE_DICT)
 
                     # Create a row
-                    minionTypesString = ", ".join([minion_type_dict[type_id] for type_id in guess_card.minion_types])
+                    minionTypesString = ", ".join([MINION_TYPE_DICT[type_id] for type_id in guess_card.minion_types])
                     values = [guess_card.image_url, guess_card.tier, guess_card.attack, guess_card.health, minionTypesString]
                     colors = []
                     for col in COLUMNS:
@@ -123,22 +137,22 @@ def index():
                             colors.append(check_value_to_color(check[col]))
 
                     # Add the row to the table_rows list
-                    table_rows.append(list(zip(values, colors)))
+                    row = list(zip(values, colors))
+                    guesses_and_rows.append((guess_card, row))
+                    finished = is_guess_correct(check)
+
         elif 'reset' in request.form:
             reset_game()
 
     # Render the index.html template with the table_rows
-    
-    return render_template('index.html', table_rows=table_rows, card_names=CARD_NAMES)
+    table_rows = get_rows()    
+    return render_template('index.html', table_rows=table_rows, finished=finished)
 
 @app.route('/get_suggestions', methods=['POST'])
 def get_suggestions():
     input_text = request.form['q']
     suggestions = [] if len(input_text.strip()) == 0 else [name for name in CARD_NAMES if input_text.lower() in name.lower()]
     suggestions.sort()
-
-    if len(suggestions) > 0:
-        print("SUGGESTIONS ", suggestions[0], len(suggestions))
     return jsonify(suggestions[:10])
 
 if __name__ == '__main__':
