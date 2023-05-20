@@ -4,6 +4,7 @@ from BattlegroundsCard import BattlegroundsCard
 from config import CLIENT_ID, CLIENT_SECRET
 import random
 from card_comparison_functions import *
+import jinja2
 
 # Init - load cards and metadata
 # Get access token
@@ -66,6 +67,7 @@ cards_dict = load_cards(token)
 minion_type_dict = load_minion_types(token)
 NUM_ATTEMPTS = 5
 target_card = random.choice(list(cards_dict.values()))
+print(target_card.name)
 
 app = Flask(__name__)
 
@@ -76,6 +78,16 @@ def reset_game():
     target_card = random.choice(list(cards_dict.values()))
     table_rows.clear()
 
+def check_value_to_color(value):
+    if abs(value) == 0:
+        return "green"
+    elif abs(value) == 1:
+        return "orange"
+    else:
+        return "red"
+
+
+COLUMNS = ["Name", "Tier", "Attack", "Health", "Minion Type"]
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
@@ -95,10 +107,16 @@ def index():
 
                 # Create a row
                 minionTypesString = ", ".join([minion_type_dict[type_id] for type_id in guess_card.minion_types])
-                row = [guess_card_name, guess_card.tier, guess_card.attack, guess_card.health, minionTypesString]
+                values = [guess_card_name, guess_card.tier, guess_card.attack, guess_card.health, minionTypesString]
+                colors = []
+                for col in COLUMNS:
+                    if col == "Name":
+                        colors.append("blank")
+                    else:
+                        colors.append(check_value_to_color(check[col]))
 
                 # Add the row to the table_rows list
-                table_rows.append(row)
+                table_rows.append(list(zip(values, colors)))
         elif 'reset' in request.form:
             reset_game()
 

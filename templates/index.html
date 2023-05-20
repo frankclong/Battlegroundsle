@@ -2,6 +2,27 @@
 <html>
 <head>
     <title>Battlegroundsle</title>
+    <style>
+        .blank {
+            background-color: white;
+            color : black;
+        }
+        
+        .red {
+            background-color: red;
+            color: white;
+        }
+
+        .green {
+            background-color: green;
+            color: white;
+        }
+
+        .orange {
+            background-color: orange;
+            color: white;
+        }
+    </style>
 </head>
 <body>
     <h1>Battlegroundsle</h1>
@@ -23,8 +44,8 @@
         </tr>
         {% for row in table_rows %}
         <tr>
-            {% for value in row %}
-            <td>{{ value }}</td>
+            {% for value, color in row %}
+            <td class="{{ color }}">{{ value }}</td>
             {% endfor %}
         </tr>
         {% endfor %}
