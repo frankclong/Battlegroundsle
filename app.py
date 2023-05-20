@@ -129,18 +129,17 @@ def index():
 
     # Render the index.html template with the table_rows
     
-    return render_template('index.html', table_rows=table_rows)
+    return render_template('index.html', table_rows=table_rows, card_names=CARD_NAMES)
 
 @app.route('/get_suggestions', methods=['POST'])
 def get_suggestions():
-    input_text = request.form['input_text']
-    suggestions = [name for name in CARD_NAMES if input_text.lower() in name.lower()]
+    input_text = request.form['q']
+    suggestions = [] if len(input_text.strip()) == 0 else [name for name in CARD_NAMES if input_text.lower() in name.lower()]
     suggestions.sort()
 
-    print("SUGGESTIONS ", suggestions[0], len(suggestions))
-    dropdown_html = render_template('dropdown.html', suggestions=suggestions)
-    return jsonify(dropdown_html=dropdown_html)
-
+    if len(suggestions) > 0:
+        print("SUGGESTIONS ", suggestions[0], len(suggestions))
+    return jsonify(suggestions[:10])
 
 if __name__ == '__main__':
     app.run(debug=True)

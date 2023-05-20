@@ -32,6 +32,35 @@
             margin-right: auto;
         }
     </style>
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js" crossorigin="anonymous"></script>
+	<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js" crossorigin="anonymous"></script>
+	<script>
+		$(function() {
+			$("#input_text").autocomplete({
+				source : function(request, response) {
+					$.ajax({
+						type: "POST",
+						url : "http://127.0.0.1:5000/get_suggestions",
+						dataType : "json",
+						cache: false,
+						data : {
+							q : request.term
+						},
+						success : function(data) {
+							// alert(data);
+							console.log(data);
+							response(data);
+						},
+						error: function(jqXHR, textStatus, errorThrown) {
+							console.log(textStatus + " " + errorThrown);
+						}
+					});
+				},
+				minLength : 1
+			});
+		});
+	</script>
 </head>
 <body>
     <h1>Battlegroundsle</h1>
@@ -39,7 +68,7 @@
     <form method="POST">
         <button type="submit" name="reset">Reset</button>
         <br>
-        <input type="text" name="input_text" placeholder="Enter a card...", autocomplete="off">
+        <input type="text" name="input_text" id="input_text" placeholder="Enter a card...">
         <button type="submit" name="guess">Guess</button>
     </form>
 
