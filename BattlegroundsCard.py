@@ -24,4 +24,5 @@ class BattlegroundsCard:
         else:
             minion_types.append(-1) 
         self.minion_types = minion_types
+        self.image_url = json['image']
         
