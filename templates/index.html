@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Battlegroundsle</title>
+</head>
+<body>
+    <h1>Battlegroundsle</h1>
+
+    <form method="POST">
+        <button type="submit" name="reset">Reset</button>
+        <br>
+        <input type="text" name="input_text" placeholder="Enter a card...">
+        <button type="submit" name="guess">Guess</button>
+    </form>
+
+    <table border="1">
+        <tr>
+            <th>Name</th>
+            <th>Tier</th>
+            <th>Attack</th>
+            <th>Health</th>
+            <th>Minion Type</th>
+        </tr>
+        {% for row in table_rows %}
+        <tr>
+            {% for value in row %}
+            <td>{{ value }}</td>
+            {% endfor %}
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>
