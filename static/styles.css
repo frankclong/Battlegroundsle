@@ -9,3 +9,21 @@
     font-family: 'Belwe-Bold', sans-serif;
     text-align: center;
   }
+
+  h1 {
+    font-size: 48px;
+  }
+
+  th {
+    font-size:  24px;
+  }
+
+  td {
+    font-size:  20px;
+  }
+
+  td, th {
+    padding: 5px;
+    text-align: center;
+    vertical-align: middle;
+  }

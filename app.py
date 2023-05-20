@@ -108,7 +108,22 @@ def is_guess_correct(check):
             return False
     return True
 
+def get_value_and_arrows_tuple(value, check_value, show_arrows = False):
+    if check_value == 0:
+        hide_text_color = "green-text"
+    elif check_value == 1:
+        hide_text_color = "orange-text"
+    else:
+        hide_text_color = "red-text"
+    if not show_arrows or check_value == 0:
+        return (hide_text_color, value, hide_text_color)
+    if check_value > 0:
+        return ("white-text", value, hide_text_color)
+    elif check_value < 0:
+        return (hide_text_color, value, "white-text")
+
 COLUMNS = ["Card", "Tier", "Attack", "Health", "Minion Type"]
+NUMERIC_COLUMNS = ["Tier", "Attack", "Health"]
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
@@ -128,7 +143,13 @@ def index():
 
                     # Create a row
                     minionTypesString = ", ".join([MINION_TYPE_DICT[type_id] for type_id in guess_card.minion_types])
-                    values = [guess_card.image_url, guess_card.tier, guess_card.attack, guess_card.health, minionTypesString]
+                    values = [
+                        get_value_and_arrows_tuple(guess_card.image_url, 0, False), 
+                        get_value_and_arrows_tuple(guess_card.tier, check['Tier'], True), 
+                        get_value_and_arrows_tuple(guess_card.attack, check['Attack'], True), 
+                        get_value_and_arrows_tuple(guess_card.health, check['Health'], True), 
+                        get_value_and_arrows_tuple(minionTypesString, check['Minion Type'], False)]
+                    print(values, flush=True)
                     colors = []
                     for col in COLUMNS:
                         if col == "Card":

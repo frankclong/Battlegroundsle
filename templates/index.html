@@ -6,29 +6,43 @@
         form {text-align: center;}
         table {text-align: center;
                 table-layout: fixed;
-                width: 700px;}
+                border-collapse: collapse;
+                width: 700px;} 
         .blank {
             background-color: white;
-            color : black;
+            /* color : black; */
         }
         
         .red {
             background-color: red;
-            color: white;
+            /* color: white; */
         }
 
         .green {
             background-color: green;
-            color: white;
+            /* color: white; */
         }
 
         .orange {
             background-color: orange;
-            color: white;
+            /* color: white; */
         }
         .center {
             margin-left: auto;
             margin-right: auto;
+        }
+
+        .red-text {
+            color:red;
+        }
+        .green-text {
+            color : green;
+        }
+        .orange-text {
+            color : orange;
+        }
+        .white-text {
+            color : white;
         }
     </style>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css')}}">
@@ -80,9 +94,13 @@
         </tr>
         {% for row in table_rows %}
         <tr>
-            <td class="{{ row[0].1 }}"><img src="{{ row[0].0 }}" height="150" width="100"></td>
+            <td class="{{ row[0].1 }}"><img src="{{ row[0].0.1 }}" height="150" width="100"></td>
             {% for value, color in row[1:] %}
-            <td class="{{ color }}">{{ value }}</td>
+            <td class="{{ color }}">
+                <div class="{{ value.0 }}">▲</div>
+                <div class="white-text">{{ value.1 }}</div>
+                <div class="{{ value.2 }}">▼</div>
+            </td>
             {% endfor %}
         </tr>
         {% endfor %}
