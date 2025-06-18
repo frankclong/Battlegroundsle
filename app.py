@@ -128,47 +128,8 @@ def get_value_and_arrows_tuple(value, check_value, show_arrows = False):
 COLUMNS = ["Card", "Tier", "Attack", "Health", "Minion Type"]
 NUMERIC_COLUMNS = ["Tier", "Attack", "Health"]
 
-@app.route('/', methods=['GET', 'POST'])
+@app.route('/', methods=['GET'])
 def index():
-    global guesses_and_rows
-    global finished
-    if request.method == 'POST':
-        if 'guess' in request.form:
-            # Get the value from the text input field
-            guess_card_name = request.form['input_text']
-            
-            if guess_card_name not in get_guesses() and not finished:
-                if guess_card_name in CARDS_DICT.keys():
-                    guess_card = CARDS_DICT[guess_card_name]
-
-                    # Return property matches
-                    check = compare_cards(target_card, guess_card, MINION_TYPE_DICT)
-
-                    # Create a row
-                    minionTypesString = ", ".join([MINION_TYPE_DICT[type_id] for type_id in guess_card.minion_types])
-                    values = [
-                        get_value_and_arrows_tuple(guess_card.image_url, 0, False), 
-                        get_value_and_arrows_tuple(guess_card.tier, check['Tier'], True), 
-                        get_value_and_arrows_tuple(guess_card.attack, check['Attack'], True), 
-                        get_value_and_arrows_tuple(guess_card.health, check['Health'], True), 
-                        get_value_and_arrows_tuple(minionTypesString, check['Minion Type'], False)]
-                    print(values, flush=True)
-                    colors = []
-                    for col in COLUMNS:
-                        if col == "Card":
-                            colors.append("blank")
-                        else:
-                            colors.append(check_value_to_color(check[col]))
-
-                    # Add the row to the table_rows list
-                    row = list(zip(values, colors))
-                    guesses_and_rows.append((guess_card, row))
-                    finished = is_guess_correct(check)
-
-        elif 'reset' in request.form:
-            reset_game()
-
-    # Render the index.html template with the table_rows
     table_rows = get_rows()    
     return render_template('index.html', table_rows=table_rows, finished=finished)
 
@@ -178,6 +139,57 @@ def get_suggestions():
     suggestions = [] if len(input_text.strip()) == 0 else [name for name in CARD_NAMES if input_text.lower() in name.lower()]
     suggestions.sort()
     return jsonify(suggestions[:10])
+
+@app.route('/submit_guess', methods=['POST'])
+def submit_guess():
+    global guesses_and_rows
+    global finished
+    
+    guess_card_name = request.form['guess']
+    
+    if guess_card_name not in get_guesses() and not finished:
+        if guess_card_name in CARDS_DICT.keys():
+            guess_card = CARDS_DICT[guess_card_name]
+
+            # Return property matches
+            check = compare_cards(target_card, guess_card, MINION_TYPE_DICT)
+
+            # Create a row
+            minionTypesString = ", ".join([MINION_TYPE_DICT[type_id] for type_id in guess_card.minion_types])
+            values = [
+                get_value_and_arrows_tuple(guess_card.image_url, 0, False), 
+                get_value_and_arrows_tuple(guess_card.tier, check['Tier'], True), 
+                get_value_and_arrows_tuple(guess_card.attack, check['Attack'], True), 
+                get_value_and_arrows_tuple(guess_card.health, check['Health'], True), 
+                get_value_and_arrows_tuple(minionTypesString, check['Minion Type'], False)]
+            
+            colors = []
+            for col in COLUMNS:
+                if col == "Card":
+                    colors.append("blank")
+                else:
+                    colors.append(check_value_to_color(check[col]))
+
+            # Add the row to the table_rows list
+            row = list(zip(values, colors))
+            guesses_and_rows.append((guess_card, row))
+            finished = is_guess_correct(check)
+            
+            return jsonify({
+                'success': True,
+                'row': row,
+                'finished': finished,
+                'message': 'Congratulations you got it!' if finished else ''
+            })
+        else:
+            return jsonify({'success': False, 'error': 'Card not found'})
+    else:
+        return jsonify({'success': False, 'error': 'Card already guessed or game finished'})
+
+@app.route('/reset_game', methods=['POST'])
+def reset_game_route():
+    reset_game()
+    return jsonify({'success': True})
 
 if __name__ == '__main__':
     app.run(debug=True)

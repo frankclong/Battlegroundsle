@@ -3,199 +3,57 @@
 
 <head>
     <title>Battlegroundsle</title>
-    <style>
-        form {
-            text-align: center;
-        }
-
-        table {
-            text-align: center;
-            table-layout: fixed;
-            border-collapse: collapse;
-            width: 700px;
-        }
-
-        .blank {
-            background-color: white;
-            /* color : black; */
-        }
-
-        .red {
-            background-color: red;
-            color: white;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
-        }
-
-        .green {
-            background-color: green;
-            color: white;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
-        }
-
-        .orange {
-            background-color: orange;
-            color: white;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
-        }
-
-        /* Make visible arrows white on colored backgrounds */
-        .red .white-text,
-        .green .white-text,
-        .orange .white-text {
-            color: white !important;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
-        }
-
-        /* Hide arrows by making them same color as background */
-        .red .red-text {
-            color: red;
-            text-shadow: none;
-        }
-
-        .green .green-text {
-            color: green;
-            text-shadow: none;
-        }
-
-        .orange .orange-text {
-            color: orange;
-            text-shadow: none;
-        }
-
-        .center {
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        .red-text {
-            color: red;
-        }
-
-        .green-text {
-            color: green;
-        }
-
-        .orange-text {
-            color: orange;
-        }
-
-        .white-text {
-            color: white;
-        }
-
-        /* Autocomplete styling */
-        .ui-autocomplete {
-            max-height: 200px;
-            overflow-y: auto;
-            border: 2px solid #ccc;
-            border-radius: 4px;
-            background: white;
-            z-index: 1000;
-        }
-
-        .ui-autocomplete .ui-menu-item {
-            padding: 8px 12px;
-            border-bottom: 1px solid #eee;
-            cursor: pointer;
-        }
-
-        .ui-autocomplete .ui-menu-item:last-child {
-            border-bottom: none;
-        }
-
-        .ui-autocomplete .ui-menu-item:hover,
-        .ui-autocomplete .ui-menu-item.ui-state-focus {
-            background-color: #007cba !important;
-            color: white !important;
-            border: none !important;
-        }
-
-        .ui-autocomplete .ui-menu-item a {
-            display: block;
-            padding: 0;
-            color: inherit;
-            text-decoration: none;
-        }
-
-        #input_text {
-            padding: 8px;
-            font-size: 16px;
-            border: 2px solid #ccc;
-            border-radius: 4px;
-            width: 300px;
-        }
-
-        #input_text:focus {
-            outline: none;
-            border-color: #007cba;
-        }
-    </style>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css')}}">
     <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js" crossorigin="anonymous"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js" crossorigin="anonymous"></script>
     <script>
-        $(function () {
-            $("#input_text").autocomplete({
-                source: function (request, response) {
-                    $.ajax({
-                        type: "POST",
-                        url: "{{ url_for('get_suggestions') }}",
-                        dataType: "json",
-                        cache: false,
-                        data: {
-                            q: request.term
-                        },
-                        success: function (data) {
-                            // alert(data);
-                            console.log(data);
-                            response(data);
-                        },
-                        error: function (jqXHR, textStatus, errorThrown) {
-                            console.log(textStatus + " " + errorThrown);
-                        }
-                    });
-                },
-                minLength: 1
-            });
-        });
+        // Configuration for external JavaScript file
+        window.URLS = {
+            get_suggestions: "{{ url_for('get_suggestions') }}",
+            submit_guess: "{{ url_for('submit_guess') }}",
+            reset_game: "{{ url_for('reset_game_route') }}"
+        };
     </script>
+    <script src="{{ url_for('static', filename='game.js') }}"></script>
 </head>
 
 <body>
     <h1>Battlegroundsle</h1>
 
-    <form method="POST">
+    <form id="guess-form" method="POST">
         <input type="text" name="input_text" id="input_text" placeholder="Enter a card...">
         <button type="submit" name="guess">Guess</button>
     </form>
     <br>
-    <table border="1" class="center">
-        <tr>
-            <th>Card</th>
-            <th>Tier</th>
-            <th>Attack</th>
-            <th>Health</th>
-            <th>Minion Type</th>
-        </tr>
-        {% for row in table_rows %}
-        <tr>
-            <td class="{{ row[0].1 }}"><img src="{{ row[0].0.1 }}" height="150" width="100"></td>
-            {% for value, color in row[1:] %}
-            <td class="{{ color }}">
-                <div class="{{ value.0 }}">▲</div>
-                <div class="white-text">{{ value.1 }}</div>
-                <div class="{{ value.2 }}">▼</div>
-            </td>
+    <div id="congratulations" style="display: none; color: green; font-weight: bold; margin: 10px 0;"></div>
+    <table id="game-table" border="1" class="center">
+        <thead>
+            <tr>
+                <th>Card</th>
+                <th>Tier</th>
+                <th>Attack</th>
+                <th>Health</th>
+                <th>Minion Type</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in table_rows %}
+            <tr>
+                <td class="{{ row[0].1 }}"><img src="{{ row[0].0.1 }}" height="150" width="100"></td>
+                {% for value, color in row[1:] %}
+                <td class="{{ color }}">
+                    <div class="{{ value.0 }}">▲</div>
+                    <div class="white-text">{{ value.1 }}</div>
+                    <div class="{{ value.2 }}">▼</div>
+                </td>
+                {% endfor %}
+            </tr>
             {% endfor %}
-        </tr>
-        {% endfor %}
+        </tbody>
     </table>
     <br>
-    <form method="POST">
-        {% if finished %}
-        <div>Congratulations you got it! Play again?</div>
-        {% endif %}
+    <form id="reset-form" method="POST">
         <button type="submit" name="reset">Reset</button>
     </form>
 </body>
