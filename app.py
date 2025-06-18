@@ -38,6 +38,9 @@ def load_cards(token):
     cards = cards_response.json()['cards']
     cards_dict = {}
     for card_info in cards:
+        # Skip non-minions
+        if card_info['cardTypeId'] != 4: 
+            continue
         card = BattlegroundsCard(card_info)
         cards_dict[card.name] = card
     
