@@ -1,10 +1,25 @@
 from flask import Flask, render_template, request, jsonify
 import requests 
 from BattlegroundsCard import BattlegroundsCard
-from config import CLIENT_ID, CLIENT_SECRET
 import random
 from card_comparison_functions import *
 import jinja2
+import os
+
+# Get API credentials from environment variables (production) or config file (development)
+def get_api_credentials():
+    client_id = os.environ.get('CLIENT_ID')
+    client_secret = os.environ.get('CLIENT_SECRET')
+    
+    if not client_id or not client_secret:
+        # Fall back to config file for local development
+        try:
+            from config import CLIENT_ID, CLIENT_SECRET
+            return CLIENT_ID, CLIENT_SECRET
+        except ImportError:
+            raise ValueError("API credentials not found. Set CLIENT_ID and CLIENT_SECRET environment variables or create a config.py file.")
+    
+    return client_id, client_secret
 
 # Init - load cards and metadata
 # Get access token
@@ -12,8 +27,7 @@ token_url = "https://oauth.battle.net/token"
 data = {
     'grant_type' : 'client_credentials'
 }
-client_id = CLIENT_ID
-client_secret = CLIENT_SECRET
+client_id, client_secret = get_api_credentials()
 
 token_response = requests.post(token_url, data=data, auth=(client_id, client_secret))
 token = token_response.json()['access_token'] 
@@ -192,4 +206,6 @@ def reset_game_route():
     return jsonify({'success': True})
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    # Use environment variable for port (Render requirement)
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port, debug=False)
