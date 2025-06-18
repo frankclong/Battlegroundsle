@@ -1,6 +1,6 @@
 # Battlegroundsle
 
-A Hearthstone Battlegrounds card guessing game built with Flask.
+A Hearthstone Battlegrounds card guessing game built with Flask. Currently hosted at https://battlegroundsle.onrender.com/
 
 ## Game Overview
 
@@ -9,8 +9,6 @@ Battlegroundsle is a Wordle-style game where you guess Hearthstone Battlegrounds
 - **Attack**: Whether the target card has more or less attack
 - **Health**: Whether the target card has more or less health  
 - **Minion Type**: Whether the target card has the same minion types
-
-## Features
 
 ## How to Play 🎮
 
@@ -27,7 +25,7 @@ Battlegroundsle is a Wordle-style game where you guess Hearthstone Battlegrounds
 
 1. **Clone the repository**
    ```bash
-   git clone <your-repo-url>
+   git clone git@github.com:frankclong/Battlegroundsle.git
    cd Battlegroundsle
    ```
 
@@ -57,56 +55,6 @@ Battlegroundsle is a Wordle-style game where you guess Hearthstone Battlegrounds
 
 6. **Open your browser**
    Navigate to `http://localhost:5000`
-
-## Deployment on Render
-
-### Prerequisites
-
-1. A Render account (free tier available)
-2. Your code pushed to a Git repository (GitHub, GitLab, etc.)
-
-### Deployment Steps
-
-1. **Prepare your repository**
-   - Ensure all files are committed and pushed to your Git repository
-   - Make sure `config.py` is in your `.gitignore` (it should be)
-
-2. **Create a new Web Service on Render**
-   - Go to [Render Dashboard](https://dashboard.render.com/)
-   - Click "New +" → "Web Service"
-   - Connect your Git repository
-
-3. **Configure the service**
-   - **Name**: `battlegroundsle` (or your preferred name)
-   - **Environment**: `Python 3`
-   - **Build Command**: `pip install -r requirements.txt`
-   - **Start Command**: `gunicorn app:app`
-
-4. **Add Environment Variables**
-   - Go to the "Environment" tab
-   - Add these environment variables:
-     - `CLIENT_ID`: Your Blizzard API Client ID
-     - `CLIENT_SECRET`: Your Blizzard API Client Secret
-
-5. **Deploy**
-   - Click "Create Web Service"
-   - Render will automatically build and deploy your app
-   - Your app will be available at `https://your-app-name.onrender.com`
-
-### Environment Variables
-
-The following environment variables are required for production:
-
-| Variable | Description | Example |
-|----------|-------------|---------|
-| `CLIENT_ID` | Your Blizzard API Client ID | `507d40b0d2b0405a92dabe79423f167c` |
-| `CLIENT_SECRET` | Your Blizzard API Client Secret | `P8aIHP1vK2WDV2pJjMPeVms5z50QGl1g` |
-
-### Important Notes
-
-- **API Rate Limits**: Blizzard API has rate limits. Consider implementing caching for production use.
-- **Security**: Never commit your `config.py` file to version control.
-- **Performance**: The app loads all cards on startup, which may take a few seconds.
 
 ## File Structure
 
@@ -146,6 +94,3 @@ Feel free to submit issues and enhancement requests!
 ## License
 
 This project is for educational purposes. Hearthstone is a trademark of Blizzard Entertainment. 
-
-
-Currently hosted at http://battlegroundsle.pythonanywhere.com/
